@@ -1,0 +1,110 @@
+# Default values for configarr.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+image:
+  repository: ghcr.io/raydak-labs/configarr
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# CronJob configuration
+cronjob:
+  # Schedule in Cron format, see https://en.wikipedia.org/wiki/Cron.
+  schedule: "0 * * * *" # Runs every hour
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  # Concurrency policy: Allow, Forbid, Replace
+  concurrencyPolicy: Forbid
+  # Restart policy for the pod
+  restartPolicy: Never
+  # Enable TTY for color support in logs
+  tty: true
+
+# Environment variables from ConfigMap
+env: {}
+  # Example:
+  # LOG_LEVEL: "info"
+
+# Configarr configuration
+config:
+  # Main configuration file content
+  # See https://configarr.de/docs/configuration/config-file/ for details
+  configYml: |
+    trashGuideUrl: https://github.com/TRaSH-Guides/Guides
+    recyclarrConfigUrl: https://github.com/recyclarr/config-templates
+
+    sonarr:
+      series:
+        base_url: http://sonarr:8989
+        api_key: !secret SONARR_API_KEY
+        quality_definition:
+          type: series
+        include:
+          # WEB-1080p
+          - template: sonarr-quality-definition-series
+          - template: sonarr-v4-quality-profile-web-1080p
+          - template: sonarr-v4-custom-formats-web-1080p
+          # WEB-2160p
+          - template: sonarr-v4-quality-profile-web-2160p
+          - template: sonarr-v4-custom-formats-web-2160p
+        custom_formats: []
+
+    radarr: {}
+
+# Secrets configuration
+secrets:
+  # Store sensitive information like API keys here
+  # Each key will be added to the secrets.yml file
+  data:
+    SONARR_API_KEY: "your-sonarr-api-key-here" # gitleaks:allow # pragma: allowlist secret
+
+# Persistence for repository cache
+persistence:
+  enabled: true
+  # existingClaim: ""
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  size: 1Gi
+  # subPath for the repos directory
+  subPath: configarr-repos
+  annotations: {}
+
+# Pod Security Context
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# Container Security Context
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+# Resources limits and requests
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# Node labels for pod assignment
+nodeSelector: {}
+
+# Tolerations for pod assignment
+tolerations: []
+
+# Affinity for pod assignment
+affinity: {}

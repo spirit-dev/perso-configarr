@@ -1,0 +1,17 @@
+apiVersion: v2
+name: configarr
+description: A Helm chart for Configarr - Configuration management for Arr applications
+type: application
+version: 0.1.0
+appVersion: "latest"
+keywords:
+  - configarr
+  - sonarr
+  - radarr
+  - automation
+home: https://configarr.de
+sources:
+  - https://github.com/raydak-labs/configarr
+maintainers:
+  - name: raydak-labs
+    url: https://github.com/raydak-labs

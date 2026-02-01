@@ -1,0 +1,87 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "configarr.fullname" . }}
+  labels:
+    {{- include "configarr.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.cronjob.schedule | quote }}
+  successfulJobsHistoryLimit: {{ .Values.cronjob.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.cronjob.failedJobsHistoryLimit }}
+  concurrencyPolicy: {{ .Values.cronjob.concurrencyPolicy }}
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            {{- include "configarr.selectorLabels" . | nindent 12 }}
+        spec:
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.podSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          containers:
+            - name: {{ .Chart.Name }}
+              {{- with .Values.securityContext }}
+              securityContext:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+              image: {{ include "configarr.image" . }}
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              {{- if .Values.cronjob.tty }}
+              tty: true
+              {{- end }}
+              {{- if .Values.env }}
+              env:
+                {{- range $key, $value := .Values.env }}
+                - name: {{ $key }}
+                  value: {{ $value | quote }}
+                {{- end }}
+              {{- end }}
+              volumeMounts:
+                {{- if .Values.persistence.enabled }}
+                - name: app-data
+                  mountPath: /app/repos
+                  {{- if .Values.persistence.subPath }}
+                  subPath: {{ .Values.persistence.subPath }}
+                  {{- end }}
+                {{- end }}
+                - name: config-volume
+                  mountPath: /app/config/config.yml
+                  subPath: config.yml
+                - name: secret-volume
+                  mountPath: /app/config/secrets.yml
+                  subPath: secrets.yml
+              {{- with .Values.resources }}
+              resources:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+          volumes:
+            {{- if .Values.persistence.enabled }}
+            - name: app-data
+              persistentVolumeClaim:
+                claimName: {{ include "configarr.pvcName" . }}
+            {{- end }}
+            - name: config-volume
+              configMap:
+                name: {{ include "configarr.fullname" . }}
+            - name: secret-volume
+              secret:
+                secretName: {{ include "configarr.fullname" . }}
+          restartPolicy: {{ .Values.cronjob.restartPolicy }}
+          {{- with .Values.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.affinity }}
+          affinity:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}

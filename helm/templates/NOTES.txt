@@ -1,0 +1,39 @@
+Thank you for installing {{ .Chart.Name }}!
+
+Your release is named {{ .Release.Name }}.
+
+Configarr has been deployed as a CronJob with the following schedule:
+  Schedule: {{ .Values.cronjob.schedule }}
+
+To check the status of your CronJob:
+  kubectl get cronjob {{ include "configarr.fullname" . }} -n {{ .Release.Namespace }}
+
+To view recent jobs:
+  kubectl get jobs -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }}
+
+To view logs from the most recent job:
+  kubectl logs -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }} --tail=100
+
+To manually trigger a job:
+  kubectl create job --from=cronjob/{{ include "configarr.fullname" . }} {{ include "configarr.fullname" . }}-manual -n {{ .Release.Namespace }}
+
+{{- if .Values.persistence.enabled }}
+
+Persistence is enabled. Repository cache will be stored in:
+  {{- if .Values.persistence.existingClaim }}
+  Existing PVC: {{ .Values.persistence.existingClaim }}
+  {{- else }}
+  New PVC: {{ include "configarr.fullname" . }}
+  {{- end }}
+{{- else }}
+
+WARNING: Persistence is disabled. Repository cache will not be persisted between runs.
+This may result in repeated downloads of the same repositories.
+{{- end }}
+
+For more information about Configarr, visit:
+  https://configarr.de/docs/
+
+To customize your configuration, update the values in:
+  - config.configYml (main configuration)
+  - secrets.secretsYml (API keys and sensitive data)
