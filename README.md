@@ -2,9 +2,7 @@
 
 This Helm chart deploys [Configarr](https://configarr.de) on a Kubernetes cluster using the Helm package manager.
 
-[![GitLab Sync](https://img.shields.io/badge/gitlab_sync-configarr-blue?style=for-the-badge&logo=gitlab)](https://gitlab-internal.spirit-dev.net/github-mirror/perso-configarr) <!-- markdownlint-disable MD041 -->
-[![GitHub Mirror](https://img.shields.io/badge/github_mirror-configarr-blue?style=for-the-badge&logo=github)](https://github.com/spirit-dev/perso-configarr)
-[![App Status](https://argocd-internal.spirit-dev.net/api/badge?name=configarr-turingpi&revision=true&showAppName=true)](https://argocd-internal.spirit-dev.net/applications/configarr-turingpi)
+
 
 <!--TOC-->
 
@@ -237,4 +235,4 @@ This Helm chart is open source and available under the same license as Configarr
 
 - [Configarr Documentation](https://configarr.de/docs/)
 - [Configarr GitHub](https://github.com/raydak-labs/configarr)
-- [TRaSH Guides](https://trash-guides.info/)
+- [TRaSH Guides](https://trash-guides.info/
